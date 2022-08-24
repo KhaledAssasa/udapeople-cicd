@@ -290,26 +290,26 @@ jobs:
   deploy-backend:
     docker:
       - image: cimg/base:stable
-      #   environment:
-      #    NODE_ENV: "production"
-      #    VERSION: "1"
-      #    ENVIRONMENT: "production"
-      #    TYPEORM_CONNECTION: $TYPEORM_CONNECTION
-      #    TYPEORM_HOST: $TYPEORM_HOST
-      #    TYPEORM_USERNAME: $TYPEORM_USERNAME
-      #    TYPEORM_PASSWORD: $TYPEORM_PASSWORD
-      #    TYPEORM_DATABASE: $TYPEORM_DATABASE
-      #    TYPEORM_PORT: $TYPEORM_PORT
-      #    TYPEORM_MIGRATIONS_DIR: "./migrations"
-      #    TYPEORM_ENTITIES: "./modules/domain/**/*.entity{.ts,.js}"
-      #    TYPEORM_MIGRATIONS: "./migrations/*.ts"
+        environment:
+         NODE_ENV: "production"
+         VERSION: "1"
+         ENVIRONMENT: "production"
+         TYPEORM_CONNECTION: $TYPEORM_CONNECTION
+         TYPEORM_HOST: $TYPEORM_HOST
+         TYPEORM_USERNAME: $TYPEORM_USERNAME
+         TYPEORM_PASSWORD: $TYPEORM_PASSWORD
+         TYPEORM_DATABASE: $TYPEORM_DATABASE
+         TYPEORM_PORT: $TYPEORM_PORT
+         TYPEORM_MIGRATIONS_DIR: "./migrations"
+         TYPEORM_ENTITIES: "./modules/domain/**/*.entity{.ts,.js}"
+         TYPEORM_MIGRATIONS: "./migrations/*.ts"
     steps:
       - checkout
       - install_awscli
       - install_ansible
       - install_nodejs
       - add_ssh_keys:
-          fingerprints: ["e5:85:5c:79:37:f6:35:d1:e3:f0:ca:85:76:90:5c:02"]
+          fingerprints: ["3d:b0:37:65:e9:fb:00:bb:1d:ae:8a:97:0c:22:e3:5a"]
       - attach_workspace:
           at: ~/
       - restore_cache:
@@ -317,17 +317,16 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            cd backend
-            npm install
+            sudo apt -y install tar gzip curl
       - run:
           name: Package backend
           command: |
             cd backend
+            npm install
             npm run build
-            tar -czf artifact.tar.gz dist/* package*
-
             cd ..
-            cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files      
+            tar -C backend -czvf artifact.tar.gz .
+            cp artifact.tar.gz .circleci/ansible/roles/deploy/files      
       - run:
           name: Deploy backend
           command: |
